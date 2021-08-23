@@ -8,6 +8,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 
+
 #background 방식으로 사용해야 start 이후 중지되지 않음
 sched = BackgroundScheduler()
 
@@ -24,7 +25,7 @@ sched.start()
 
 #예약 정보를 받고 보내는 부분(기구별로 나눔)
 @app.route('/bench_reservation',methods=['GET','POST'])
-def reserve():
+def reserve_bench():
     if request.method == 'GET':
         b = []
         data = Bench.query.all()
@@ -53,7 +54,7 @@ def reserve():
 
 
 @app.route('/aerobic_reservation',methods=['GET','POST'])
-def reserve():
+def reserve_aerobic():
     if request.method == 'GET':
         b = []
         data = Aerobic.query.all()
@@ -80,7 +81,7 @@ def reserve():
         return 'OK'
 
 @app.route('/reck_reservation/<date>',methods=['GET','POST'])
-def reserve(date):
+def reserve_reck(date):
     if request.method == 'GET':
         b = []
         data = Reck.query.filter(Reck.date == date).all()
