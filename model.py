@@ -30,14 +30,14 @@ class User(db.Model):
 class Bench(db.Model):
     __tablename__ = "bench"
     id = db.Column(db.Integer, primary_key=True, unique=True)
-    name = db.Column(db.String(32))
+    userid = db.Column(db.String(32))
     date = db.Column(db.String(32))
     start_time = db.Column(db.String(32))
     end_time = db.Column(db.String(32))
 
-    def __init__(self,id,name,date,start_time,end_time):
+    def __init__(self,id,userid,date,start_time,end_time):
         self.id = id
-        self.name = name
+        self.userid = userid
         self.date = date
         self.start_time = start_time
         self.end_time = end_time
@@ -45,14 +45,14 @@ class Bench(db.Model):
 class Reck(db.Model):
     __tablename__ = "reck"
     id = db.Column(db.Integer, primary_key=True, unique=True)
-    name = db.Column(db.String(32))
+    userid = db.Column(db.String(32))
     date = db.Column(db.String(32))
     start_time = db.Column(db.String(32))
     end_time = db.Column(db.String(32))
 
-    def __init__(self, id, name, date, start_time, end_time):
+    def __init__(self, id, userid, date, start_time, end_time):
         self.id = id
-        self.name = name
+        self.userid = userid
         self.date = date
         self.start_time = start_time
         self.end_time = end_time
@@ -60,14 +60,14 @@ class Reck(db.Model):
 class Aerobic(db.Model):
     __tablename__ = "aerobic"
     id = db.Column(db.Integer, primary_key=True, unique=True)
-    name = db.Column(db.String(32))
+    userid = db.Column(db.String(32))
     date = db.Column(db.String(32))
     start_time = db.Column(db.String(32))
     end_time = db.Column(db.String(32))
 
-    def __init__(self, id, name, date, start_time, end_time):
+    def __init__(self, id, userid, date, start_time, end_time):
         self.id = id
-        self.name = name
+        self.userid = userid
         self.date = date
         self.start_time = start_time
         self.end_time = end_time
