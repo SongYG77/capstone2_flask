@@ -1,11 +1,12 @@
-from model import db, User, Bench, Reck, Aerobic
-from flask import Flask, render_template, request, redirect, jsonify,Response
+from model import db, User, Bench, Reck, Aerobic, Ptclass
+from flask import Flask, render_template, request, redirect, jsonify,Response, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import schedule
-import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask_jwt_extended import *
+import json
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -334,6 +335,50 @@ def delReservation(userid):
             else:
                 response = Response(status=404)
                 return response
+
+@app.route('/pt/<userid>',methods=['GET','POST'])
+def pt(userid):
+    if request.method == 'POST':
+        classinfo = request.form['classinfo']
+        date = request.form['date']
+        user_id = []
+        for i in Reck.query.all():
+            user_id.append(i.userid)
+
+        if userid in user_id:
+            ptclass = Ptclass(id, userid, date, classinfo)
+            db.session.add(ptclass)
+            db.session.commit()
+            return "OK"
+        else :
+            return 'Fail'
+    elif request.method == 'GET':
+        date = []
+        classinfo =[]
+        starttime =[]
+        li = []
+        todaydate = datetime.today().strftime("%Y-%m-%d")
+        a = Ptclass.query.filter((Ptclass.userid == userid)&(Ptclass.date >= todaydate)).order_by('date').all()
+
+        for i in a:
+            date.append(i.date)
+            classinfo.append(i.classinfo)
+            starttime.append(i.starttime)
+
+        for i in range(len(date)):
+            dictionary = {'시간' : date[i], '수업 내용' : classinfo[i], '시작 시간': starttime[i]}
+            li.append(dictionary)
+
+        pt = {
+            'id' : userid,
+            'history' : li
+        }
+
+        pt_json = json.dumps(pt, ensure_ascii=False)
+        res = make_response(pt_json)
+
+        return res
+
 
 if __name__ == "__main__":
     migrate = Migrate()
