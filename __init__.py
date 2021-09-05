@@ -120,7 +120,6 @@ def reserve_reck(date):
         end_lst_min = []
         data = Reck.query.filter(Reck.date == date).all()
         for i in data:
-
             start_lst_hour.append(i.start_time.split(':')[0])
             start_lst_min.append(i.start_time.split(':')[1])
             end_lst_hour.append(i.end_time.split(':')[0])
@@ -190,7 +189,7 @@ def reserve_reck(date):
                 return_data = 'overlap_user'
 
         if return_data == 'OK' :
-            reck = Reck(maxid+1, userid, date, start_time, end_time)
+            reck = Reck( userid, date, start_time, end_time)
             db.session.add(reck)
             db.session.commit()
         return return_data
