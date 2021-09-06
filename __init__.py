@@ -142,7 +142,7 @@ def reserve_reck(date):
         res_start_time = int(temp[0])*100 + int(temp[1])
         temp = end_time.split(':')
         res_end_time = int(temp[0]) * 100 + int(temp[1])
-        return_data = 'OK'
+        return_data = {"error" : "OK"}
         data = Reck.query.filter(Reck.date == date).all()
         maxid = 0
         for i in data :
@@ -153,13 +153,13 @@ def reserve_reck(date):
 
             if maxid<i.id : maxid = i.id
             if res_start_time>=data_stime and res_start_time<=data_etime :
-                return_data = 'overlap'
+                return_data = {"error" : "overlap"}
             elif res_end_time>=data_stime and res_end_time<=data_etime :
-                return_data = 'overlap'
+                return_data = {"error" : "overlap"}
             elif res_start_time<=data_stime and data_stime<=res_end_time :
-                return_data = 'overlap'
+                return_data = {"error" : "overlap"}
             elif i.userid == userid :
-                return_data = "overlap_today"
+                return_data = {"error" : "overlap_today"}
 
         benchdata = Bench.query.filter( Bench.date == date).filter(Bench.userid == userid).all()
         aerobicdata = Aerobic.query.filter( Aerobic.date == date).filter(Aerobic.userid == userid).all()
@@ -170,11 +170,11 @@ def reserve_reck(date):
             temp = i.end_time.split(':')
             data_etime = int(temp[0]) * 100 + int(temp[1])
             if res_start_time>=data_stime and res_start_time<=data_etime :
-                return_data = 'overlap_user'
+                return_data = {"error" : "overlap_user"}
             elif res_end_time>=data_stime and res_end_time<=data_etime :
-                return_data = 'overlap_user'
+                return_data = {"error" : "overlap_user"}
             elif res_start_time<=data_stime and data_stime<=res_end_time :
-                return_data = 'overlap_user'
+                return_data = {"error" : "overlap_user"}
 
         for i in aerobicdata:
             temp = i.start_time.split(':')
@@ -182,17 +182,17 @@ def reserve_reck(date):
             temp = i.end_time.split(':')
             data_etime = int(temp[0]) * 100 + int(temp[1])
             if res_start_time>=data_stime and res_start_time<=data_etime :
-                return_data = 'overlap_user'
+                return_data = {"error" : "overlap_user"}
             elif res_end_time>=data_stime and res_end_time<=data_etime :
-                return_data = 'overlap_user'
+                return_data = {"error" : "overlap_user"}
             elif res_start_time<=data_stime and data_stime<=res_end_time :
-                return_data = 'overlap_user'
+                return_data = {"error" : "overlap_user"}
 
-        if return_data == 'OK' :
+        if return_data["error"] == "OK" :
             reck = Reck( userid, date, start_time, end_time)
             db.session.add(reck)
             db.session.commit()
-        return return_data
+        return jsonify(return_data)
 
 
 # 유저 마이페이지 부분, 사용자의 예약 정보를 불러옴.
