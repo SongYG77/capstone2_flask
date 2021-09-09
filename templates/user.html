@@ -1,0 +1,24 @@
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <script> alert("{{messages[-1]}}")
+        </script>
+    {% endif %}
+{% endwith %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>비켜</title>
+</head>
+<body>
+    <form action="/check" method="POST">
+        회원번호를 입력해주세요<br>
+        <input type = 'text' name ='userid'><br>
+        <input type ='submit' value="입실" name="in">
+        <input type ='submit' value="퇴실" name="in"><br>
+        현재 이용자 수 : {{number}}
+
+    </form>
+</body>
+</html>
