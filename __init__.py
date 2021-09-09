@@ -1,5 +1,5 @@
 from model import db, User, Bench, Reck, Aerobic, Ptclass
-from flask import Flask, render_template, request, redirect, jsonify,Response, make_response
+from flask import Flask, render_template, request, redirect, jsonify,Response, make_response , flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import schedule
@@ -9,6 +9,7 @@ import json
 from datetime import datetime
 
 app = Flask(__name__)
+app.secret_key = 'dhksgml123'
 
 # background 방식으로 사용해야 start 이후 중지되지 않음
 sched = BackgroundScheduler()
@@ -18,7 +19,7 @@ app.config.update(
     JWT_SECRET_KEY = 'example secret key'
 )
 jwt = JWTManager(app)
-
+user = []
 
 # 지금은 테스트를 위해 매 분 갱신 이후에는('cron', hour='0', minute='10', id='update_db') 0시 10분에 갱신되도록 바꿀 예정
 @sched.scheduled_job('cron', hour='0', minute='10', id='update_db')
@@ -27,7 +28,7 @@ def update_db():
     # Reck.query.filter(datetime.datetime.strptime(Reck.date, "%Y-%m-%d").date() < datetime.date.today()).delete()
     # Aerobic.query.filter(datetime.datetime.strptime(Aerobic.date, "%Y-%m-%d").date() < datetime.date.today()).delete()
     db.session.commit()
-
+    #user = []
 
 # 스캐쥴링 시작. 실행되고 있는 동안 스캐쥴에 의해 실행될 것.
 sched.start()
@@ -378,11 +379,64 @@ def pt(userid):
 
         return res
 
+#인터넷 웹 파트
+@app.route('/management_system')
+def basic():
+    #print(request.form['userid'])
+    #print(request.form['in'])
+    #print(request.form['out'])
+    return render_template('user.html',number=len(user))
+
+
+@app.route('/check',methods=['POST'])
+def check():
+    global user
+    userid = request.form['userid']
+    if request.form['in'] == '입실':
+        aa = User.query.filter(User.id == userid).all()
+        bb = User.query.all()
+
+        if len(aa) == 0:
+            flash('사용자 번호가 잘못입력되었습니다.')
+            return render_template('user.html',number=len(user))
+        else:
+            if userid in user:
+                flash('이미 입실처리가 되었습니다')
+                print(user)
+                return render_template('user.html',number=len(user))
+            else:
+                user.append(userid)
+                print(user)
+                flash('입실 처리 되었습니다.')
+                return render_template('user.html',number=len(user))
+
+    elif request.form['in'] == '퇴실':
+        if userid in user:
+            user.remove(userid)
+            flash('퇴실 처리 되었습니다.')
+            print(user)
+            return render_template('user.html',number=len(user))
+        else:
+            flash('이미 퇴실 처리 되었습니다.')
+            return render_template('user.html',number=len(user))
+
+
+@app.route('/using',methods=['GET'])
+def using():
+    global user
+    if request.method =='GET':
+        pe = {
+            'number' : len(user)
+        }
+        pe_json = json.dumps(pe, ensure_ascii=False)
+        res = make_response(pe_json)
+
+        return res
 
 if __name__ == "__main__":
     migrate = Migrate()
     #mysql://root:thddbs00@localhost:3306/capstone
-    app.config['SQLALCHEMY_DATABASE_URI'] = ''
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://capstone:capstone2@capdb.c8wz24ghmr8c.us-east-2.rds.amazonaws.com:3306/capstone?charset=utf8'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
     db.app = app
