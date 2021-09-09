@@ -436,7 +436,7 @@ def using():
 if __name__ == "__main__":
     migrate = Migrate()
     #mysql://root:thddbs00@localhost:3306/capstone
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://capstone:capstone2@capdb.c8wz24ghmr8c.us-east-2.rds.amazonaws.com:3306/capstone?charset=utf8'
+    app.config['SQLALCHEMY_DATABASE_URI'] = ''
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
     db.app = app
