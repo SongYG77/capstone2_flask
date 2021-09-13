@@ -6,7 +6,7 @@ import schedule
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask_jwt_extended import *
 import json
-from datetime import datetime
+from datetime import datetime,date
 
 app = Flask(__name__)
 app.secret_key = 'dhksgml123'
@@ -22,13 +22,15 @@ jwt = JWTManager(app)
 user = []
 
 # 지금은 테스트를 위해 매 분 갱신 이후에는('cron', hour='0', minute='10', id='update_db') 0시 10분에 갱신되도록 바꿀 예정
-@sched.scheduled_job('cron', hour='0', minute='10', id='update_db')
+@sched.scheduled_job('cron', hour='0', minute='05', id='update_db')
 def update_db():
-    # Bench.query.filter(datetime.datetime.strptime(Bench.date, "%Y-%m-%d").date() < datetime.date.today()).delete()
-    # Reck.query.filter(datetime.datetime.strptime(Reck.date, "%Y-%m-%d").date() < datetime.date.today()).delete()
-    # Aerobic.query.filter(datetime.datetime.strptime(Aerobic.date, "%Y-%m-%d").date() < datetime.date.today()).delete()
+    global user
+    Bench.query.filter(Bench.date < datetime.today().strftime('%Y-%m-%d')).delete()
+    Reck.query.filter(Reck.date < datetime.today().strftime('%Y-%m-%d')).delete()
+    Aerobic.query.filter(Aerobic.date < datetime.today().strftime('%Y-%m-%d')).delete()
     db.session.commit()
-    #user = []
+    user = []
+    print("reset")
 
 # 스캐쥴링 시작. 실행되고 있는 동안 스캐쥴에 의해 실행될 것.
 sched.start()
@@ -139,13 +141,31 @@ def reserve_reck(date):
         start_time = params['start_time']
         end_time = params["end_time"]
 
+
         temp = start_time.split(':')
+        if temp[1] == '0' :
+            temp[1] = '00'
+            start_time = ':'.join(temp)
+        elif temp[1] == '5' :
+            temp[1] = '05'
+            start_time = ':'.join(temp)
         res_start_time = int(temp[0])*100 + int(temp[1])
+
+
         temp = end_time.split(':')
+        if temp[1] == '0' :
+            temp[1] = '00'
+            end_time = ':'.join(temp)
+        elif temp[1] == '5' :
+            temp[1] = '05'
+            end_time = ':'.join(temp)
         res_end_time = int(temp[0]) * 100 + int(temp[1])
+
+
         return_data = {"msg" : "OK"}
         data = Reck.query.filter(Reck.date == date).all()
         maxid = 0
+
         for i in data :
             temp = i.start_time.split(':')
             data_stime = int(temp[0])*100 + int(temp[1])
