@@ -78,13 +78,30 @@ class Ptclass(db.Model):
     date = db.Column(db.String(32))
     classinfo = db.Column(db.String(200))
     starttime = db.Column(db.String(32))
-
-    def __init__(self, id, userid, date, classinfo, starttime):
+    teacher = db.Column(db.String(20))
+    def __init__(self, id, userid, date, classinfo, starttime, teacher):
         self.id = id
         self.userid = userid
         self.date = date
         self.classinfo = classinfo
         self.starttime = starttime
+        self.teacher = teacher
+
+
+class Ptinfo(db.Model):
+    __tablename__ = 'Ptinfo'
+    id = db.Column(db.Integer, primary_key=True,unique=True,autoincrement=True)
+    equip = db.Column(db.String(32))
+    set = db.Column(db.String(32))
+    count = db.Column(db.String(32))
+    Pt_key = db.Column(db.Integer, db.ForeignKey('Ptclass.id'))
+
+    def __init__(self, id, equip, set, count, Pt_key):
+        self.id = id
+        self.equip = equip
+        self.set = set
+        self.count = count
+        self.Pt_key = Pt_key
 
 
 

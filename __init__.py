@@ -1,4 +1,4 @@
-from model import db, User, Bench, Reck, Aerobic, Ptclass
+from model import db, User, Bench, Reck, Aerobic, Ptclass, Ptinfo
 from flask import Flask, render_template, request, redirect, jsonify,Response, make_response , flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -25,10 +25,10 @@ user = []
 @sched.scheduled_job('cron', hour='0', minute='05', id='update_db')
 def update_db():
     global user
-    Bench.query.filter(Bench.date < datetime.today().strftime('%Y-%m-%d')).delete()
-    Reck.query.filter(Reck.date < datetime.today().strftime('%Y-%m-%d')).delete()
-    Aerobic.query.filter(Aerobic.date < datetime.today().strftime('%Y-%m-%d')).delete()
-    db.session.commit()
+    # Bench.query.filter(Bench.date < datetime.today().strftime('%Y-%m-%d')).delete()
+    # Reck.query.filter(Reck.date < datetime.today().strftime('%Y-%m-%d')).delete()
+    # Aerobic.query.filter(Aerobic.date < datetime.today().strftime('%Y-%m-%d')).delete()
+    # db.session.commit()
     user = []
     print("reset")
 
@@ -223,9 +223,9 @@ def reservation_user(userid):
 
         reservelist = []
 
-        benchdata = Bench.query.filter(Bench.userid == userid).all()
-        reckdata = Reck.query.filter(Reck.userid == userid).all()
-        aerobicdata = Aerobic.query.filter(Aerobic.userid == userid).all()
+        benchdata = Bench.query.filter((Bench.userid == userid)&(Bench.date >= datetime.today().strftime('%Y-%m-%d'))).all()
+        reckdata = Reck.query.filter((Reck.userid == userid)&(Reck.date >= datetime.today().strftime('%Y-%m-%d'))).all()
+        aerobicdata = Aerobic.query.filter((Aerobic.userid == userid)&(Aerobic.date >= datetime.today().strftime('%Y-%m-%d'))).all()
 
         for i in benchdata:
             temp = {
@@ -300,12 +300,29 @@ def aerobicreserve_user(userid):
 @app.route('/userdata/<userid>', methods=['GET', 'POST'])
 def getUserData(userid):
     if request.method == 'GET':
+        mindate = '9999'
+        count = 0
+
         data = User.query.filter(User.id == userid).all()
-        temp={}
+
         for i in data:
             a = {'userid': i.id, 'user_name': i.name, 'start_date': i.start_date, 'end_date': i.end_date,
                  'enrollment': i.enrollment}
-            temp=a
+            enroll = i.enrollment
+
+        if enroll == 'PT' :
+            ptdata = Ptclass.query.filter((Ptclass.userid == userid) & (Ptclass.date >= datetime.today().strftime('%Y-%m-%d'))).all()
+            ptallcount = Ptclass.query.filter(Ptclass.userid == userid).count()
+            for j in ptdata :
+                count = count + 1
+                if mindate > j.date:
+                    a['ptdate'] = j.date
+                    a['ptinfo'] = j.classinfo
+                    a['key'] = j.id
+                    mindate = j.date
+            a['remaining'] = str(count)
+            a['allcount'] = str(ptallcount)
+
         return jsonify(a)
 
 @app.route('/delete/<userid>',methods=['DELETE'])
@@ -374,28 +391,58 @@ def pt(userid):
             return 'Fail'
     elif request.method == 'GET':
         date = []
+        key=[]
         classinfo =[]
         starttime =[]
         li = []
         todaydate = datetime.today().strftime("%Y-%m-%d")
-        a = Ptclass.query.filter((Ptclass.userid == userid)&(Ptclass.date >= todaydate)).order_by('date').all()
-
+        a = Ptclass.query.filter(Ptclass.userid == userid).order_by('date').all()
+        t = []
         for i in a:
             date.append(i.date)
             classinfo.append(i.classinfo)
             starttime.append(i.starttime)
+            t.append(i.teacher)
+            key.append(i.id)
 
         for i in range(len(date)):
-            dictionary = {'시간' : date[i], '수업 내용' : classinfo[i], '시작 시간': starttime[i]}
+            dictionary = {'기본키': key[i],'시간' : date[i], '수업 내용' : classinfo[i], '시작 시간': starttime[i], '트레이너': t[i]}
             li.append(dictionary)
 
         pt = {
             'id' : userid,
             'history' : li
+
         }
 
         pt_json = json.dumps(pt, ensure_ascii=False)
         res = make_response(pt_json)
+
+        return res
+
+
+@app.route('/ptinfo/<key>',methods=['GET','POST'])
+def ptinfo(key):
+    if request.method =='GET':
+        a = Ptinfo.query.filter(Ptinfo.Pt_key == key).all()
+        li = []
+
+        for i in a:
+            info = {
+                '운동': i.equip,
+                '세트': i.set,
+                '횟수': i.count
+            }
+            li.append(info)
+        #dic = {
+        #    'key': key,
+        #    'info': li
+        #}
+        #dic_json = json.dumps(dic, ensure_ascii=False)
+        #res = make_response(dic_json)
+
+        li_json = json.dumps(li, ensure_ascii=False)
+        res = make_response(li_json)
 
         return res
 
@@ -456,7 +503,7 @@ def using():
 if __name__ == "__main__":
     migrate = Migrate()
     #mysql://root:thddbs00@localhost:3306/capstone
-    app.config['SQLALCHEMY_DATABASE_URI'] = ''
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://capstone:capstone2@capdb.c8wz24ghmr8c.us-east-2.rds.amazonaws.com:3306/capstone?charset=utf8'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
     db.app = app
