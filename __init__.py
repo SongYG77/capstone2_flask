@@ -1,4 +1,4 @@
-from model import db, User, Bench, Reck, Aerobic, Ptclass, Ptinfo
+from model import db, User, Bench, Reck, Aerobic, Ptclass, Ptinfo, Gym
 from flask import Flask, render_template, request, redirect, jsonify,Response, make_response , flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -307,7 +307,7 @@ def getUserData(userid):
 
         for i in data:
             a = {'userid': i.id, 'user_name': i.name, 'start_date': i.start_date, 'end_date': i.end_date,
-                 'enrollment': i.enrollment}
+                 'enrollment': i.enrollment, 'gym' : i.gym}
             enroll = i.enrollment
 
         if enroll == 'PT' :
@@ -445,6 +445,29 @@ def ptinfo(key):
         res = make_response(li_json)
 
         return res
+
+
+@app.route('/gyminfo/<name>',methods = ['GET'])
+def gyminfo(name) :
+    if request.method == 'GET' :
+        data = Gym.query.filter(Gym.name == name).all()
+
+        for i in data :
+            info = {
+                'name' : i.name,
+                'reck' : i.reck,
+                'bench' : i.bench,
+                'running' : i.running,
+                'leg_press' : i.leg_press,
+                'long_pull' : i.long_pull
+            }
+
+        info_re = json.dumps(info, ensure_ascii=False)
+        res = make_response(info_re)
+        return res
+
+
+################################################################################
 
 #인터넷 웹 파트
 @app.route('/management_system')

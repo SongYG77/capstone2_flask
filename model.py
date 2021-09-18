@@ -14,8 +14,10 @@ class User(db.Model):
     start_date = db.Column(db.String(45))
     end_date = db.Column(db.String(45))
     enrollment = db.Column(db.String(45))
+    gym = db.Column(db.String(45))
 
-    def __init__(self,id,password,name,address,sex,start_date,end_date,enrollment):
+
+    def __init__(self,id,password,name,address,sex,start_date,end_date,enrollment, gym):
         self.id = id
         self.password = password
         self.name = name
@@ -24,6 +26,7 @@ class User(db.Model):
         self.start_date = start_date
         self.end_date = end_date
         self.enrollment = enrollment
+        self.gym = gym
 
 
 
@@ -103,5 +106,23 @@ class Ptinfo(db.Model):
         self.count = count
         self.Pt_key = Pt_key
 
+class Gym(db.Model) :
+    __tablename__ = 'Gym'
+    idGym = db.Column(db.Integer, primary_key=True,unique=True,autoincrement=True)
+    name = db.Column(db.String(45))
+    reck = db.Column(db.Integer)
+    bench = db.Column(db.Integer)
+    running = db.Column(db.Integer)
+    leg_press = db.Column(db.Integer)
+    long_pull = db.Column(db.Integer)
+
+    def __init__(self, idGym, name, reck, bench, running, leg_press, long_pull):
+        self.idGym = idGym
+        self.name = name
+        self.reck = reck
+        self.bench = bench
+        self.running = running
+        self.leg_press = leg_press
+        self.long_pull = long_pull
 
 
