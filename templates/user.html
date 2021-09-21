@@ -11,14 +11,127 @@
     <meta charset="UTF-8">
     <title>비켜</title>
 </head>
-<body>
-    <form action="/check" method="POST">
+<style>
+    body{
+    background-color :"#F2E9E1";
+     margin : 0;
+     padding:0;
+     bottom-margin:0;
+    }
+
+    .main_container {
+        background-color : #F2E9E1;
+        width:100%;
+        height:100%;
+    }
+
+    .main_title {
+
+        width:100%;
+        height:130px;
+        background-color: #F2E9E1;
+        float:left;
+        border-bottom-width:thin;
+        border-bottom-color:rgba(25,80,100,0);
+        border-bottom:solid;
+    }
+
+    .main_left_btn {
+        width:50%;
+        height:530px;
+        background-color:#F2E9E1;
+        float:left;
+    }
+
+    .main_right_btn {
+        width:50%;
+        height:530px;
+        background-color:#E0E4CC;
+        float:left;
+    }
+    .btn {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+    }
+    button {
+    height: 70px;
+    outline: none;
+    }
+
+    #userid {
+    width: 100%;
+    text-align: right;
+    border: none;
+    background: white;
+    padding-right: 1rem;
+    font-size: 3rem;
+    }
+    .in_out {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    height: 70px;
+    outline: none;
+
+    }
+
+</style>
+
+<script >
+function addOutput(num) {
+  var display = document.getElementById("userid");
+  display.value = display.value + num;
+}
+function del() {
+  var display = document.getElementById("userid");
+  display.value = display.value.substring(0, display.value.length - 1);
+}
+
+
+</script>
+
+<body background-color = "#F2E9E1">
+<div class="main_container">
+
+<div class="main_title">타이틀</div>
+
+<div class="main_left_btn">
+
+    왼쪽
+
+</div>
+<div class="main_right_btn" >
+ <div>
+     <form action="/check" method="POST">
         회원번호를 입력해주세요<br>
-        <input type = 'text' name ='userid'><br>
-        <input type ='submit' value="입실" name="in">
-        <input type ='submit' value="퇴실" name="in"><br>
+        <input type = 'text' name ='userid' id = 'userid' ><br><br>
+         <div class = 'in_out'>
+        <input type ='submit' value="입실" name="in" >
+        <input type ='submit' value="퇴실" name="in">
+         </div>
+     </form>
+
+    <div class="btn">
+	<button onclick="addOutput(1)">1</button>
+	<button onclick="addOutput(2)">2</button>
+	<button onclick="addOutput(3)">3</button>
+	<button onclick="addOutput(4)">4</button>
+	<button onclick="addOutput(5)">5</button>
+	<button onclick="addOutput(6)">6</button>
+	<button onclick="addOutput(7)">7</button>
+	<button onclick="addOutput(8)">8</button>
+	<button onclick="addOutput(9)">9</button>
+        <button> </button>
+	<button onclick="addOutput(0)">0</button>
+
+         <button onclick="del()">del</button>
+</div>
         현재 이용자 수 : {{number}}
 
-    </form>
+</div>
+
+</div>
+</div>
+
 </body>
+
 </html>
