@@ -125,4 +125,32 @@ class Gym(db.Model) :
         self.leg_press = leg_press
         self.long_pull = long_pull
 
+class Wellsfit_count(db.Model):
+    __tablename__ = 'Wellsfit_count'
+    id = db.Column(db.Integer, primary_key=True,unique=True,autoincrement=True)
+    userid = db.Column(db.String(10))
+    name = db.Column(db.String(45))
+    datetime = db.Column(db.String(30))
+    state = db.Column(db.String(10))
+
+    def __init__(self, userid, name, datetime, state):
+        self.userid = userid
+        self.name = name
+        self.datetime = datetime
+        self.state = state
+
+
+class Chungdahm_count(db.Model):
+    __tablename__ = 'Chungdahm_count'
+    id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
+    userid = db.Column(db.String(10))
+    name = db.Column(db.String(45))
+    datetime = db.Column(db.String(30))
+    state = db.Column(db.String(10))
+
+    def __init__(self, userid, name, datetime, state):
+        self.userid = userid
+        self.name = name
+        self.datetime = datetime
+        self.state = state
 

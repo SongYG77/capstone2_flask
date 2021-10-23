@@ -1,4 +1,4 @@
-from model import db, User, Bench, Reck, Aerobic, Ptclass, Ptinfo, Gym
+from model import db, User, Bench, Reck, Aerobic, Ptclass, Ptinfo, Gym, Wellsfit_count, Chungdahm_count
 from flask import Flask, render_template, request, redirect, jsonify,Response, make_response , flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -223,9 +223,15 @@ def reservation_user(userid):
 
         reservelist = []
 
-        benchdata = Bench.query.filter((Bench.userid == userid)&(Bench.date >= datetime.today().strftime('%Y-%m-%d'))).all()
-        reckdata = Reck.query.filter((Reck.userid == userid)&(Reck.date >= datetime.today().strftime('%Y-%m-%d'))).all()
-        aerobicdata = Aerobic.query.filter((Aerobic.userid == userid)&(Aerobic.date >= datetime.today().strftime('%Y-%m-%d'))).all()
+        benchdata = Bench.query.filter(
+            (Bench.userid == userid)&(Bench.date >= datetime.today().strftime('%Y-%m-%d'))
+        ).all()
+        reckdata = Reck.query.filter(
+            (Reck.userid == userid)&(Reck.date >= datetime.today().strftime('%Y-%m-%d'))
+        ).all()
+        aerobicdata = Aerobic.query.filter(
+            (Aerobic.userid == userid)&(Aerobic.date >= datetime.today().strftime('%Y-%m-%d'))
+        ).all()
 
         for i in benchdata:
             temp = {
@@ -469,54 +475,68 @@ def gyminfo(name) :
 
 ################################################################################
 
-#인터넷 웹 파트
+##인터넷 웹 파트
 @app.route('/management_system')
 def basic():
     #print(request.form['userid'])
     #print(request.form['in'])
     #print(request.form['out'])
-    return render_template('user.html',number=len(user))
+    return render_template('user.html',number=Wellsfit_count.query.count())
 
 
 @app.route('/check',methods=['POST'])
 def check():
-    global user
     userid = request.form['userid']
-    if request.form['in'] == '입실':
+    now = datetime.now()
+    date = now.strftime('%Y-%m-%d %H:%M')
+    time = now.strftime('%H:%M')
+    state = request.form['in']
+    #gym =   User.query.filter(User.id == userid).all()[0].gym
+    #if gym == '웰스핏':
+    if state == '입실':
         aa = User.query.filter(User.id == userid).all()
-        bb = User.query.all()
-
+        bb = Wellsfit_count.query.filter(Wellsfit_count.userid == userid).all()
         if len(aa) == 0:
             flash('사용자 번호가 잘못입력되었습니다.')
-            return render_template('user.html',number=len(user))
+            return render_template('user.html',number=Wellsfit_count.query.count())
         else:
-            if userid in user:
+            if len(bb) != 0:
                 flash('이미 입실처리가 되었습니다')
-                print(user)
-                return render_template('user.html',number=len(user))
+                return render_template('user.html',number=Wellsfit_count.query.count())
             else:
-                user.append(userid)
-                print(user)
+                name = aa[0].name
+                wellsfit =Wellsfit_count(userid,name, date,state)
+                db.session.add(wellsfit)
+                db.session.commit()
                 flash('입실 처리 되었습니다.')
-                return render_template('user.html',number=len(user))
+                return render_template('user.html',number=Wellsfit_count.query.count())
 
-    elif request.form['in'] == '퇴실':
-        if userid in user:
-            user.remove(userid)
-            flash('퇴실 처리 되었습니다.')
-            print(user)
-            return render_template('user.html',number=len(user))
-        else:
+    elif state == '퇴실':
+        aa = User.query.filter(User.id == userid).all()
+        bb = Wellsfit_count.query.filter(Wellsfit_count.userid == userid).all()
+        print(len(bb))
+        print(len(aa))
+        if len(bb) == 0 and len(aa) != 0:
             flash('이미 퇴실 처리 되었습니다.')
-            return render_template('user.html',number=len(user))
+            return render_template('user.html',number=Wellsfit_count.query.count())
+        elif len(aa) == 0:
+            flash('사용자 번호가 잘못입력되었습니다.')
+            return render_template('user.html',number=Wellsfit_count.query.count())
+        else :
+            cc = Wellsfit_count.query.filter(Wellsfit_count.userid == userid).first()
+            db.session.delete(cc)
+            db.session.commit()
+            flash('퇴실 처리 되었습니다.')
+
+            return render_template('user.html',number=Wellsfit_count.query.count())
 
 
 @app.route('/using',methods=['GET'])
 def using():
-    global user
+
     if request.method =='GET':
         pe = {
-            'number' : len(user)
+            'number' : Wellsfit_count.query.count()
         }
         pe_json = json.dumps(pe, ensure_ascii=False)
         res = make_response(pe_json)
