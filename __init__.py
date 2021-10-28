@@ -45,16 +45,16 @@ def login():
 
         data = User.query.filter((userid == User.id) & (password == User.password)).first()
         if data != None :
-            resualt = {
-                "resualt" : 'OK',
+            result = {
+                "result" : 'OK',
                 "access_token" : create_access_token(identity=userid , expires_delta=False)
             }
-            return jsonify(resualt)
+            return jsonify(result)
         else :
-            resualt = {
-                "resualt" : 'Fail'
+            result = {
+                "result" : 'Fail'
             }
-            return jsonify(resualt)
+            return jsonify(result)
 
 
 # 예약 정보를 받고 보내는 부분(기구별로 나눔)
