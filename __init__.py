@@ -502,7 +502,6 @@ def board():
 def comments(b_id):
     if request.method == 'POST':
         params = request.get_json()
-        b_id = params['b_id']
         comment = params['comment']
         userid = params['userid']
 
@@ -537,7 +536,7 @@ def board_all(category):
                 'id' :i.id,
                 'userid' : i.userid,
                 'title' : i.title,
-                'head' : i.content[0:10],
+                'head' : i.content[0:10] + '...',
                 'image' : i.image,
                 'datetime' : i.datetime
             }
