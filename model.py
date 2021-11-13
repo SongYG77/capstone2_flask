@@ -154,3 +154,37 @@ class Chungdahm_count(db.Model):
         self.datetime = datetime
         self.state = state
 
+class Board(db.Model) :
+    __tablename__ = 'Board'
+    id = db.Column(db.Integer, primary_key=True,unique=True,autoincrement=True)
+    category = db.Column(db.String(45),nullable=False)
+    userid = db.Column(db.String(45),nullable=False)
+    image = db.Column(db.String(45))
+    datetime = db.Column(db.String(45),nullable=False)
+    content = db.Column(db.String(500),nullable=False)
+    title = db.Column(db.String(100),nullable=False)
+
+    def __init__(self, id, category, userid, image, datetime, content, title):
+        self.id = id
+        self.category = category
+        self.userid = userid
+        self.image = image
+        self.datetime = datetime
+        self.content = content
+        self.title = title
+
+class Comments(db.Model) :
+    __tablename__ = 'Comments'
+    id = db.Column(db.Integer, primary_key=True,unique=True,autoincrement=True)
+    board_id = db.Column(db.Integer,db.ForeignKey('Board.id'))
+    userid = db.Column(db.String(45),nullable=False)
+    datetime = db.Column(db.String(45),nullable=False)
+    comment = db.Column(db.String(500),nullable=False)
+
+
+    def __init__(self, id, board_id, userid, datetime, comment):
+        self.id = id
+        self.board_id = board_id
+        self.userid = userid
+        self.datetime = datetime
+        self.comment = comment

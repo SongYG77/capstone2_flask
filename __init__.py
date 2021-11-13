@@ -1,4 +1,4 @@
-from model import db, User, Bench, Reck, Aerobic, Ptclass, Ptinfo, Gym, Wellsfit_count, Chungdahm_count
+from model import db, User, Bench, Reck, Aerobic, Ptclass, Ptinfo, Gym, Wellsfit_count, Chungdahm_count, Board, Comments
 from flask import Flask, render_template, request, redirect, jsonify,Response, make_response , flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -7,6 +7,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from flask_jwt_extended import *
 import json
 from datetime import datetime,date
+import pytz
 
 app = Flask(__name__)
 app.secret_key = 'dhksgml123'
@@ -471,6 +472,93 @@ def gyminfo(name) :
         info_re = json.dumps(info, ensure_ascii=False)
         res = make_response(info_re)
         return res
+
+
+###########################################################################
+#게시판.
+
+KST = pytz.timezone('Asia/Seoul')
+
+@app.route('/board',methods=['GET','POST'])
+def board():
+    if request.method == 'POST':
+        params = request.get_json()
+        userid = params['userid']
+        category = params['category']
+        image = params['image']
+        content = params["content"]
+        title = params["title"]
+        date_time = datetime.now(KST).strftime('%Y-%m-%d %H:%M:%S')
+
+        if image == 'None':
+            image = None
+
+        board = Board(id="",category=category,userid=userid, image=image, datetime=date_time, content=content, title=title)
+        db.session.add(board)
+        db.session.commit()
+        return "Success post"
+
+@app.route('/comments/<b_id>',methods=['GET','POST'])
+def comments(b_id):
+    if request.method == 'POST':
+        params = request.get_json()
+        b_id = params['b_id']
+        comment = params['comment']
+        userid = params['userid']
+
+        date_time = datetime.now(KST).strftime('%Y-%m-%d %H:%M:%S')
+        comments = Comments(id="",board_id=b_id, userid=userid, datetime=date_time, comment=comment)
+        db.session.add(comments)
+        db.session.commit()
+        return "Success post"
+
+    if request.method == 'GET' :
+        rtlst = []
+        data = Comments.query.filter(Comments.board_id == b_id).all()
+        for i in data :
+            temp = {
+                'id' : i.id,
+                'b_id' : i.board_id,
+                'userid' : i.userid,
+                'datetime' : i.datetime,
+                'comment' : i.comment
+            }
+            rtlst.append(temp)
+        return jsonify(rtlst)
+
+
+@app.route('/board_all/<category>',methods=['GET','POST'])
+def board_all(category):
+    if request.method == 'GET':
+        rtlst = []
+        data = Board.query.filter(Board.category == category).all()
+        for i in data :
+            temp = {
+                'id' :i.id,
+                'userid' : i.userid,
+                'title' : i.title,
+                'head' : i.content[0:10],
+                'image' : i.image,
+                'datetime' : i.datetime
+            }
+            rtlst.append(temp);
+        return jsonify(rtlst)
+
+@app.route('/board_one/<id>',methods=['GET','POST'])
+def board_one(id):
+    if request.method == 'GET':
+        data = Board.query.filter(Board.id == id).all()
+        for i in data :
+            temp = {
+                'id' :i.id,
+                'category' : i.category,
+                'userid' : i.userid,
+                'title' : i.title,
+                'content' : i.content,
+                'image' : i.image,
+                'datetime' : i.datetime
+            }
+        return jsonify(temp)
 
 
 ################################################################################
