@@ -163,8 +163,9 @@ class Board(db.Model) :
     datetime = db.Column(db.String(45),nullable=False)
     content = db.Column(db.String(500),nullable=False)
     title = db.Column(db.String(100),nullable=False)
+    comment_count = db.Column(db.Integer)
 
-    def __init__(self, id, category, userid, image, datetime, content, title):
+    def __init__(self, id, category, userid, image, datetime, content, title, comment_count):
         self.id = id
         self.category = category
         self.userid = userid
@@ -172,6 +173,7 @@ class Board(db.Model) :
         self.datetime = datetime
         self.content = content
         self.title = title
+        self.comment_count = comment_count
 
 class Comments(db.Model) :
     __tablename__ = 'Comments'

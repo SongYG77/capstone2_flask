@@ -507,6 +507,10 @@ def comments(b_id):
 
         date_time = datetime.now(KST).strftime('%Y-%m-%d %H:%M:%S')
         comments = Comments(id="",board_id=b_id, userid=userid, datetime=date_time, comment=comment)
+
+        cc = Board.query.filter(Board.id == b_id).first()
+        cc.comment_count = cc.comment_count + 1
+
         db.session.add(comments)
         db.session.commit()
         return "Success post"
@@ -538,7 +542,8 @@ def board_all(category):
                 'title' : i.title,
                 'head' : i.content[0:10] + '...',
                 'image' : i.image,
-                'datetime' : i.datetime
+                'datetime' : i.datetime,
+                'comment_count' : i.comment_count
             }
             rtlst.append(temp);
         return jsonify(rtlst)
@@ -559,6 +564,20 @@ def board_one(id):
             }
         return jsonify(temp)
 
+@app.route('/delete/board',methods=['DELETE'])
+def delboard():
+    pk = request.args.get('pk')
+    Board.query.filter(Board.id == pk).delete()
+    db.session.commit()
+    return "Board Delete Success"
+
+
+@app.route('/delete/comments',methods=['DELETE'])
+def delcomments():
+    pk = request.args.get('pk')
+    Comments.query.filter(Comments.id == pk).delete()
+    db.session.commit()
+    return "Comments Delete Success"
 
 ################################################################################
 
