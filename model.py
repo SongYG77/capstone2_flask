@@ -5,8 +5,8 @@ db = SQLAlchemy()
 
 class User(db.Model):
     __tablename__ = "user_table"
-    id_num = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
-    id = db.Column(db.String(32),unique=True)
+    #id_num = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
+    id = db.Column(db.String(32),unique=True,primary_key=True)
     password = db.Column(db.String(32))
     name = db.Column(db.String(32))
     address = db.Column(db.String(100))
@@ -33,7 +33,7 @@ class User(db.Model):
 class Bench(db.Model):
     __tablename__ = "bench"
     id = db.Column(db.Integer, primary_key=True, unique=True)
-    userid = db.Column(db.String(32))
+    userid = db.Column(db.String(32),db.ForeignKey('user_table.id',ondelete='CASCADE'))
     date = db.Column(db.String(32))
     start_time = db.Column(db.String(32))
     end_time = db.Column(db.String(32))
@@ -48,7 +48,7 @@ class Bench(db.Model):
 class Reck(db.Model):
     __tablename__ = "reck"
     id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
-    userid = db.Column(db.String(32))
+    userid = db.Column(db.String(32),db.ForeignKey('user_table.id',ondelete='CASCADE'))
     date = db.Column(db.String(32))
     start_time = db.Column(db.String(32))
     end_time = db.Column(db.String(32))
@@ -62,7 +62,7 @@ class Reck(db.Model):
 class Aerobic(db.Model):
     __tablename__ = "aerobic"
     id = db.Column(db.Integer, primary_key=True, unique=True)
-    userid = db.Column(db.String(32))
+    userid = db.Column(db.String(32),db.ForeignKey('user_table.id',ondelete='CASCADE'))
     date = db.Column(db.String(32))
     start_time = db.Column(db.String(32))
     end_time = db.Column(db.String(32))
@@ -77,7 +77,7 @@ class Aerobic(db.Model):
 class Ptclass(db.Model):
     __tablename__ = "Ptclass"
     id = db.Column(db.Integer, primary_key=True,unique=True,autoincrement=True)
-    userid = db.Column(db.String(32))
+    userid = db.Column(db.String(32),db.ForeignKey('user_table.id',ondelete='CASCADE'))
     date = db.Column(db.String(32))
     classinfo = db.Column(db.String(200))
     starttime = db.Column(db.String(32))
@@ -97,7 +97,7 @@ class Ptinfo(db.Model):
     equip = db.Column(db.String(32))
     set = db.Column(db.String(32))
     count = db.Column(db.String(32))
-    Pt_key = db.Column(db.Integer, db.ForeignKey('Ptclass.id'))
+    Pt_key = db.Column(db.Integer, db.ForeignKey('Ptclass.id',ondelete='CASCADE'))
 
     def __init__(self, id, equip, set, count, Pt_key):
         self.id = id
@@ -128,7 +128,7 @@ class Gym(db.Model) :
 class Wellsfit_count(db.Model):
     __tablename__ = 'Wellsfit_count'
     id = db.Column(db.Integer, primary_key=True,unique=True,autoincrement=True)
-    userid = db.Column(db.String(10))
+    userid = db.Column(db.String(10),db.ForeignKey('user_table.id',ondelete='CASCADE'))
     name = db.Column(db.String(45))
     datetime = db.Column(db.String(30))
     state = db.Column(db.String(10))
@@ -143,7 +143,7 @@ class Wellsfit_count(db.Model):
 class Chungdahm_count(db.Model):
     __tablename__ = 'Chungdahm_count'
     id = db.Column(db.Integer, primary_key=True, unique=True, autoincrement=True)
-    userid = db.Column(db.String(10))
+    userid = db.Column(db.String(10),db.ForeignKey('user_table.id',ondelete='CASCADE'))
     name = db.Column(db.String(45))
     datetime = db.Column(db.String(30))
     state = db.Column(db.String(10))
@@ -158,7 +158,7 @@ class Board(db.Model) :
     __tablename__ = 'Board'
     id = db.Column(db.Integer, primary_key=True,unique=True,autoincrement=True)
     category = db.Column(db.String(45),nullable=False)
-    userid = db.Column(db.String(45),nullable=False)
+    userid = db.Column(db.String(45),db.ForeignKey('user_table.id',ondelete='CASCADE'),nullable=False)
     image = db.Column(db.String(45))
     datetime = db.Column(db.String(45),nullable=False)
     content = db.Column(db.String(500),nullable=False)
@@ -178,7 +178,7 @@ class Board(db.Model) :
 class Comments(db.Model) :
     __tablename__ = 'Comments'
     id = db.Column(db.Integer, primary_key=True,unique=True,autoincrement=True)
-    board_id = db.Column(db.Integer,db.ForeignKey('Board.id'))
+    board_id = db.Column(db.Integer,db.ForeignKey('Board.id',ondelete='CASCADE'))
     userid = db.Column(db.String(45),nullable=False)
     datetime = db.Column(db.String(45),nullable=False)
     comment = db.Column(db.String(500),nullable=False)
