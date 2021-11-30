@@ -159,7 +159,7 @@ class Board(db.Model) :
     id = db.Column(db.Integer, primary_key=True,unique=True,autoincrement=True)
     category = db.Column(db.String(45),nullable=False)
     userid = db.Column(db.String(45),db.ForeignKey('user_table.id',ondelete='CASCADE'),nullable=False)
-    image = db.Column(db.String(45))
+    image = db.Column(db.String(800))
     datetime = db.Column(db.String(45),nullable=False)
     content = db.Column(db.String(500),nullable=False)
     title = db.Column(db.String(100),nullable=False)

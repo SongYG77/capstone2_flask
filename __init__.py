@@ -493,7 +493,7 @@ def board():
         if image == 'None':
             image = None
 
-        board = Board(id="",category=category,userid=userid, image=image, datetime=date_time, content=content, title=title)
+        board = Board(id="",category=category,userid=userid, image=image, datetime=date_time, content=content, title=title, comment_count= 0)
         db.session.add(board)
         db.session.commit()
         return "Success post"
