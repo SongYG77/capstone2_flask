@@ -1,3 +1,10 @@
+
+#프로젝트 : 캡스톤2 헬스장 종합 어플리케이션 api
+#기능 : 예약 시스템, 유저 정보, 로그인, 스케쥴, 게시판
+#프로젝트 기간 : 2021-06 ~ 2021-12
+#완료
+
+
 from model import db, User, Bench, Reck, Aerobic, Ptclass, Ptinfo, Gym, Wellsfit_count, Chungdahm_count, Board, Comments
 from flask import Flask, render_template, request, redirect, jsonify,Response, make_response , flash
 from flask_sqlalchemy import SQLAlchemy
@@ -659,3 +666,5 @@ if __name__ == "__main__":
     db.create_all()
     migrate.init_app(app, db)
     app.run(debug = False, host = '0.0.0.0')
+
+#finish the project
